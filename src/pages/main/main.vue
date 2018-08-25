@@ -1,0 +1,755 @@
+<template>
+	<div class="main" v-bind:class="{ 'code-hide':codeHideFlag }">
+		<header class="head" v-on:click="ceshiClick">
+			<div class="back-btn"></div>
+			<div class="head-title">安装信息</div>
+			<div class="edit"></div>
+		</header>
+
+		<div class="main-box">
+			<!--   add-gis-->
+			<ul class="from-box ">
+
+				<li class="list-gis-wrap">
+					<div class="list-gis">
+						<div class="gis-flag">
+							<div class="icon"></div>
+							<span class="title">{{lng | gisFlag}}</span>
+						</div>
+						<div class="gis-btn" v-on:click="toGis"></div>
+					</div>
+				</li>
+
+				<li class="list">
+					<div class="list-title">
+						<div class="check active"></div>
+						<span class="title">灯杆</span>
+					</div>
+					<input class="list-input" type="text" v-model="poleNum" v-on:blur="poleInputBlur(poleNum)" />
+				</li>
+
+				<li class="list wglist">
+
+					<div class="wgbox" v-for="(item,index) in gatewayData">
+						<div class="list-title">
+							<div class="check-box">
+								<input type="radio" :value="item" :id="'wk_check_'+index" name="lan" />
+								<label class="check-title" :for="'wk_check_'+index">{{item.sblxStr}}</label>
+							</div>
+						</div>
+						<div class="device-right">
+							<div class="list-zcbh">{{item.sbbh}}</div>
+						</div>
+					</div>
+
+					<div class="wgbox" v-for="(item,index) in gatewayNum">
+						<div class="list-title">
+							<div class="check-box">
+								<input type="radio" :value="index" :id="'wk_check_input_'+index" name="lan" />
+								<label class="check-title" :for="'wk_check_input_'+index">网关</label>
+							</div>
+						</div>
+						<div class="device-right">
+							<input class="list-input" type="text" :id="'wg'+index" :value="item" v-on:blur="gatewayInputBlur(index)" />
+						</div>
+						<div class="close-btn" v-on:click="removeWg(index)" v-if=" index != 0 "></div>
+					</div>
+
+					<div class="addDevic" v-on:click="addgateway"></div>
+				</li>
+
+				<li class="list">
+					<div class="list-title">
+						<div class="check"></div>
+						<span class="title">设备</span>
+					</div>
+
+					<div class="device-right">
+						<div class="device-box" v-for="(item,index) in deviceData" v-on:click="changedev(index)">
+							<div class="device-title">{{item.ccbh}}</div>
+							<div class="device-main">
+								<div class="dev-main-left" v-bind:class="[ item.sblx ? 'pic' + item.sblx  : '']"></div>
+								<div class="dev-main-right">
+									<div class="main-net">
+										<span class="main-title net-title">{{ item.txlx | wkName}}：</span>
+										<i class="net">{{item.wkh?item.wkh:(item.ckh?item.ckh:item.jdwlxh)}}</i>
+										<!--    item.ckh?item.ckh:item.jdwlxh-->
+									</div>
+									<div class="main-ac">
+										<span class="main-title net-title">{{ item.ydlx | ydName}} ：</span>
+										<i class="net">{{item.kzhlh}}</i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="addDevic" v-on:click="addDevic"></div>
+				</li>
+
+				<li class="list">
+					<div class="list-title">
+						<div class="check"></div>
+						<span class="title">现场照片</span>
+					</div>
+					<div class="img-box">
+						<div class="img-item" v-for="(item,index) in imgsArr">
+							<img v-gallery:imgsArr :src="item.src">
+						</div>
+						<div class="img-item img-add" @click="actionSheet">+</div>
+					</div>
+				</li>
+			</ul>
+
+			<div class="btn btn-galy" v-on:click="submitBtn" v-bind:class="{ 'subtrue':submintFlag }">提交</div>
+
+			<!--扫码按钮-->
+			<div class="scan-code-wrap" v-show="hidshow">
+				<div class="code-box" @click="toWebCode()">
+					<div class="code-icon"></div>
+					<div class="code-font">扫码/拍照</div>
+				</div>
+			</div>
+
+			<!-- modal-show-->
+			<div class="modal-box">
+				<div class="modal-main">
+					<div class="modal-body">扫码内容与已有档案冲突确认是否覆盖？</div>
+					<div class="modal-btn">
+						<div class="btn-see" @click="seeClash">查看冲突档案</div>
+						<div class="btn-sure">确定</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<mt-actionsheet :actions="actions" v-model="sheetVisible">
+		</mt-actionsheet>
+	</div>
+</template>
+
+<script>
+	import { mapState } from 'vuex'
+	import { Indicator } from 'mint-ui'
+	import { Toast } from 'mint-ui'
+	import { isNull } from '../../../static/js/common.js'
+	import { Actionsheet } from 'mint-ui';
+
+	export default {
+		data() {
+			return {
+				liu: "wei",
+				docmHeight: document.documentElement.clientHeight,  //默认屏幕高度
+				showHeight: document.documentElement.clientHeight,   //实时屏幕高度
+				hidshow: true,  //显示或者隐藏footer
+				imgsArr: [{
+					src: 'https://gpic.qpic.cn/gbar_pic/2aqluyraXicEfqicaK3aV4iaib5icib78qF0eFxokIEKSewIg8hQW0kiavCQg/1000'
+				}],
+				actions: [{
+					name: '拍照',
+					method: this.getCamera	// 调用methods中的函数
+				}, {
+					name: '从相册中选择',
+					method: this.getLibrary	// 调用methods中的函数
+				}],
+				// action sheet 默认不显示，为false。操作sheetVisible可以控制显示与隐藏
+				sheetVisible: false,
+				poleNum:''
+			}
+		},
+		filters: {	//判断网口类型
+			wkName: function (value) {
+				let wk = "";
+				if (value == "2") {
+					wk = "LAN用网";
+				} else {
+					wk = "458串口";
+				}
+				return wk;
+			},
+			ydName: function (val) {	//电的类型
+				let yd = "";
+				if (val == "3") {
+					yd = "交流用电";
+				} else {
+					yd = "直流用电";
+				}
+				return yd;
+			},
+			gisFlag: function (val) {	//过滤
+				let lng = "";
+				if (val == "") {
+					lng = "未定位";
+				} else {
+					lng = "定为Ok";
+				}
+				return lng;
+			}
+		},
+		computed: {	//属性的一个实时计算
+			...mapState({		//取state里面的值
+				submintFlag: state => state.main_store.submintFlag,	//是否可以提交
+				lng: state => state.main_store.lng,
+				gatewayData: state => state.main_store.gatewayData,
+				gatewayNum: state => state.main_store.gatewayNum,		//网关数量
+				deviceData: state => state.main_store.deviceData,		//新增设备
+				codeHideFlag: state => state.main_store.codeHideFlag,	//隐藏搜索框
+
+			}),
+			poleNum: {	//灯杆号
+				get() {
+					return this.$store.state.main_store.poleNum;
+				},
+				set(val) {
+					this.$store.commit('setPoleNum', val);
+				}
+			}
+		},
+		methods: {
+			actionSheet: function () {
+				this.sheetVisible = true;
+			},
+			showPics(url, name) {
+				var that = this
+				plus.io.resolveLocalFileSystemURL(url, function (entry) {
+					entry.file(function (file) {
+						var fileReader = new plus.io.FileReader();
+						console.log(fileReader)
+						fileReader.readAsDataURL(file);
+						fileReader.onloadend = function (e) {
+							var picUrl = e.target.result.toString();
+							that.imgsArr.push({
+								src: picUrl
+							})
+						}
+					});
+				});
+			},
+			compressImage(url, filename) {
+				var that = this;
+				var name = "_doc/upload/" + filename;
+				plus.zip.compressImage({
+					src: url,//src: (String 类型 )压缩转换原始图片的路径  
+					dst: name,//压缩转换目标图片的路径  
+					quality: 40,//quality: (Number 类型 )压缩图片的质量.取值范围为1-100  
+					overwrite: true//overwrite: (Boolean 类型 )覆盖生成新文件  
+				},
+					function (zip) {
+						//页面显示图片
+						that.showPics(zip.target, name);
+					}, function (error) {
+						plus.nativeUI.toast("压缩图片失败，请稍候再试");
+					})
+			},
+			getCamera: function () {
+				var that = this;
+				var cmr = plus.camera.getCamera();
+				cmr.captureImage(function (p) {
+					plus.io.resolveLocalFileSystemURL(p, function (entry) {
+						that.compressImage(entry.toLocalURL(), entry.name);
+					}, function (e) {
+						plus.nativeUI.toast("读取拍照文件错误：" + e.message);
+					});
+				}, function (e) {
+				}, {
+						filter: 'image'
+					});
+				console.log("打开照相机")
+			},
+			getLibrary: function () {
+				var that = this;
+				plus.gallery.pick(function (e) {
+					var name = e.substr(e.lastIndexOf('/') + 1);
+					that.compressImage(e, name);
+				}, function (e) {
+				}, {
+						filter: "image"
+					});
+				console.log("打开相册")
+			},
+			toWebCode() {
+				this.$router.push('/h5plus')
+			},
+			toGis: function () {	//跳转gis页面
+				this.$router.push('/gis');
+			},
+			poleInputBlur: function (val) {		//灯杆失去焦点事件
+				let poleNum = {
+					dgh: val
+				}
+				this.$store.dispatch("queryPoleData", poleNum);
+			},
+			ScanCode: function () {	//扫码
+				let arr = this.$store.state.main_store.gatewayNum;
+				debugger
+			},
+			submitBtn: function () {	//提交按钮
+				this.$store.commit("submitPoleData");
+			},
+			addgateway: function () {	//增加网关
+				this.$store.commit("setGatewayNum");
+			},
+			gatewayInputBlur: function (index) {	//网关失去焦点事件
+				this.$store.commit("setGatewayNumArr", index);
+			},
+			removeWg: function (index) {		//新增设备
+				this.$store.commit("removeGatewayNumArr", index);
+			},
+			addDevic: function () {	//新增设备
+				this.$store.commit("computedWg");
+				let $main = this.$store.state.main_store;
+				let newArr = $main.gatewayArr;	//新增数组
+				if (newArr.length > 0) {
+					this.$router.push('/addDev');
+				} else {
+					Toast("请添加物联网关");
+				}
+			},
+			changedev: function (index) {	//更改设备页面
+				this.$store.commit("toDevice", index);
+				this.$router.push('/device');
+			},
+			ceshiClick: function () {	//测试事件
+				//  	this.$store.commit("getDeviceData");
+				//			this.$router.push('/code');
+			},
+			seeClash() {
+				this.$router.push('/clash')
+			}
+
+
+		},
+		mounted() {
+			// window.onresize监听页面高度的变化
+			window.onresize = () => {
+				return (() => {
+					this.showHeight = document.body.clientHeight;
+				})()
+			}
+		},
+		watch: {
+			showHeight: function () {
+				if (this.docmHeight > this.showHeight) {
+					this.hidshow = false
+				} else {
+					this.hidshow = true
+				}
+			},
+			poleNum() {
+				if (this.poleNum.length >= 9) {
+					console.log(poleNum)
+				}
+			}
+		}
+	}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+	.open {
+		z-index: 1000
+	}
+
+	.btn-galy {
+		background: #c0c0c0;
+	}
+
+	.wgbox .list-title {
+		padding-left: 0.74rem;
+	}
+
+	.wgbox .list-title .check-box label {
+		font-size: 12px;
+		color: #bbbcc2;
+		position: relative;
+	}
+
+	.wgbox .list-title .check-box label:after {
+		content: "";
+		width: 0.40rem;
+		height: 0.40rem;
+		position: absolute;
+		left: -0.70rem;
+		top: 0px;
+		background: url(../../assets/check.png) no-repeat;
+		background-size: 100% 100%;
+
+	}
+
+	.wgbox .list-title .check-box input {
+		display: none;
+	}
+
+	.check-box input[type="radio"]:checked+label:after {
+		background: url(../../assets/checked.png) no-repeat;
+		background-size: 100% 100%;
+	}
+
+	.from-box .wglist .last-wgbox .list-title {
+		padding-left: 0;
+	}
+
+
+
+
+	.device-box {
+		width: 4.6rem;
+		min-height: 1.14rem;
+		margin-bottom: 0.15rem;
+	}
+
+	.device-title {
+		height: 1.38rem;
+		line-height: 1.38rem;
+		text-align: left;
+		color: #fff;
+	}
+
+	.device-main {
+		display: flex;
+	}
+
+	.device-main .dev-main-left {
+		width: 1rem;
+		height: 1rem;
+	}
+
+	.device-main .dev-main-right {
+		margin-left: 0.45rem;
+		color: #fff;
+		font-size: 0.30rem;
+	}
+
+	.device-main .main-title {
+		margin-right: 0.1rem;
+	}
+
+	.modal-box {
+		display: none;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.5);
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 10001;
+	}
+
+	.modal-show {
+		display: block;
+	}
+
+	.modal-box .modal-main {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		margin: auto;
+		width: 7.0rem;
+		height: 4.5rem;
+		background: #fff;
+		border-radius: 5px;
+		display: flex;
+		justify-content: space-between;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.modal-main .modal-body {
+		flex: 1;
+		padding: 1.2rem 1.2rem 0 1.2rem;
+	}
+
+	.modal-main .modal-btn {
+		height: 1.3rem;
+		width: 100%;
+		border-top: 1px solid #C0C0C0;
+		border-bottom: 1px solid #C0C0C0;
+		border-radius: 0 0 5px 5px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.modal-btn .btn-see {
+		border-right: 1px solid #C0C0C0;
+	}
+
+	.modal-btn .btn-see,
+	.modal-btn .btn-sure {
+		height: 100%;
+		width: 50%;
+		line-height: 1.3rem;
+	}
+
+
+
+	.main {
+		width: 100%;
+		height: 100%;
+		background: url(../../assets/index_bg.png) no-repeat;
+		background-size: 100% 100%;
+		background-position-y: 1.5rem;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.main-box {
+		flex: 1;
+		padding-bottom: 1rem;
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	.head {
+		width: 100%;
+		height: 1.77rem;
+		background: #0c1234;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.36rem 0.40rem 0.3rem 0.40rem;
+	}
+
+	.head .back-btn {
+		width: 0.40rem;
+		height: 0.62rem;
+		/*background: url(../../assets/back_bg.png) no-repeat;
+    background-size: 100% 100%;*/
+	}
+
+	.head .head-title {
+		width: 2.10rem;
+		height: 0.50rem;
+		color: #fff;
+		font-size: 0.50rem;
+	}
+
+	.head .edit {
+		width: 0.90rem;
+		height: 0.50rem;
+		color: #fff;
+		font-size: 0.42rem;
+	}
+
+	.list-gis {
+		height: 1.40rem;
+		padding: 0 0.05rem 0 0.54rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.list-gis .gis-flag {
+		width: 2.20rem;
+		height: 100%;
+		display: flex;
+		align-items: center;
+	}
+
+	.list-gis .gis-flag .icon {
+		width: 0.40rem;
+		height: 0.4rem;
+		margin-right: 0.35rem;
+		background: url(../../assets/gis_check.png) no-repeat;
+		background-size: 100% 100%;
+	}
+
+	.list-gis .gis-flag .title {
+		font-size: 12px;
+		color: #fff;
+	}
+
+	.list-gis .gis-btn {
+		width: 1.70rem;
+		height: 0.55rem;
+		border: 1px solid #fff;
+		border-radius: 0.05rem;
+		background: url(../../assets/gis_btn.png) no-repeat;
+		background-size: 100% 100%;
+	}
+
+	.from-box {
+		padding: 0.5rem 0.70rem 0 0.70rem;
+		margin-bottom: .80rem;
+	}
+
+	.add-gis {
+		padding: 0.35rem 0.70rem 0 0.70rem;
+		margin-bottom: 2.00rem;
+	}
+
+	.from-box .list {
+		min-height: 1.38rem;
+		margin-bottom: 0.20rem;
+		background: rgba(149, 149, 149, 0.1);
+		padding: 0 0.72rem 0 0.54rem;
+		display: flex;
+		justify-content: flex-start;
+		/*align-items: center;*/
+		position: relative;
+	}
+
+	.from-box .list .addDevic {
+		width: 0.45rem;
+		height: 0.45rem;
+		position: absolute;
+		right: 0.78rem;
+		top: 0.4rem;
+		background: url(../../assets/add_bg.png) no-repeat;
+		background-size: 100% 100%;
+	}
+
+	.list .list-title {
+		width: 2.40rem;
+		height: 1.38rem;
+		display: flex;
+		align-items: center;
+	}
+
+	.list .list-title .check {
+		width: 0.40rem;
+		height: 0.40rem;
+		margin-right: 0.35rem;
+		background: url(../../assets/check.png) no-repeat;
+		background-size: 100% 100%;
+	}
+
+	.list .list-title .active {
+		background: url(../../assets/checked.png) no-repeat;
+		background-size: 100% 100%;
+	}
+
+	.list .list-title .title {
+		font-size: 12px;
+		color: #bbbcc2;
+	}
+
+	.list-input {
+		color: #fff;
+		font-size: 0.34rem;
+		border: none;
+		width: 4.3rem;
+		height: 0.80rem;
+		line-height: 0.80rem;
+		background: rgba(255, 255, 255, 0.1);
+		outline: none;
+		margin-top: 0.3rem;
+		border: 1px solid #323957;
+	}
+
+	.list-input:focus {
+		outline: none;
+	}
+
+	.btn {
+		width: 5.00rem;
+		height: 1.05rem;
+		border: 1px solid #fff;
+		line-height: 1.05rem;
+		text-align: center;
+		margin: 0 auto;
+		font-size: 0.44rem;
+		color: #fff;
+		border-radius: 3px;
+	}
+
+	.scan-code-wrap {
+		position: fixed;
+		left: -8%;
+		bottom: 0;
+		z-index: 999;
+		width: 116%;
+		height: 5rem;
+		background: #fff;
+		border-radius: 50% 50% 0 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.code-hide .scan-code-wrap {
+		bottom: -4.25rem;
+	}
+
+	.code-hide .from-box {
+		margin-bottom: 0.80rem;
+	}
+
+	.scan-code-wrap .code-box {
+		width: 3.45rem;
+		height: 3.45rem;
+		background: #2277da;
+		border-radius: 50%;
+		padding-top: 0.85rem;
+	}
+
+	.scan-code-wrap .code-box .code-icon {
+		width: 0.70rem;
+		height: 0.70rem;
+		background: url(../../assets/scan_code.png) no-repeat;
+		background-size: 100% 100%;
+		margin: 0 auto;
+		margin-bottom: 0.5rem;
+	}
+
+	.code-font {
+		color: #fff;
+		font-size: 0.36rem;
+	}
+
+	.subtrue {
+		background: transparent;
+	}
+
+	.wglist {
+		flex-direction: column;
+	}
+
+	.wgbox {
+		width: 100%;
+		display: flex;
+		position: relative;
+	}
+
+	.wgbox .close-btn {
+		width: 0.45rem;
+		height: 0.45rem;
+		position: absolute;
+		right: 0.7rem;
+		top: 0.42rem;
+		background: url(../../assets/close_btn.png) center center no-repeat;
+		background-size: 90% 90%;
+	}
+
+	.list-zcbh {
+		height: 1.38rem;
+		line-height: 1.38rem;
+		color: #fff;
+		text-align: left;
+	}
+
+	.img-box {
+		flex: 1;
+		margin-top: 0.5rem
+	}
+
+	.img-item {
+		overflow: hidden;
+		float: left;
+		width: 1.5rem;
+		height: 1.5rem;
+		margin: 0 .3rem .3rem 0;
+	}
+
+	.img-add {
+		font-weight: 100;
+		background: rgba(255, 255, 255, 0.1);
+		font-size: 1.2rem;
+		color: rgba(255, 255, 255, 0.12)
+	}
+
+	.add-file {
+		display: none;
+	}
+</style>

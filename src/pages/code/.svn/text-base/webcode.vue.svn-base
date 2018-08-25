@@ -1,0 +1,253 @@
+<template>
+	<div class="code">
+	    <video id="video" height="100%"  muted></video>
+	    <canvas id='canvas' width='400' height='400'></canvas>
+	    <img id='img' src=''>
+    	<canvas id="cover"></canvas>
+		<div class="close" @click="closeMedia">×</div>  
+		<div id="line-animate">
+			<div id="line"></div>
+		</div>
+	</div>
+	
+</template>
+
+<script>
+import '@/assets/js/ykcode.js'
+import qrcode from '@/assets/js/ykcode.js'
+import {mapActions} from 'vuex'
+
+	
+
+export default {
+	data(){
+		return{
+			qrcode : qrcode.qrcode(),
+			c:0
+		}
+		
+	},
+//	beforeRouteLeave(to, from, next) {
+//		
+//  	next()
+//	},
+//	beforeRouteEnter(to, from, next) {
+//	    console.log(' beforeRouteEnter !')
+//	    next()
+//	},
+	mounted:function(){
+           var c=0;
+		   var video = document.getElementById('video'),
+		        canvas = document.getElementById('canvas'),
+		        img = document.getElementById('img'),
+		        vendorUrl = window.URL || window.webkitURL
+		    //媒体对象
+		    navigator.getMedia = navigator.getUserMedia ||
+		                         navigator.webkitGetUserMedia ||
+		                         navigator.mozGetUserMedia ||
+		                         navigator.msGetUserMedia;
+		    navigator.getMedia({
+		        video: true, //使用摄像头对象
+		        audio: false  //不使用音频
+		    }, function(strem){
+		        
+		        video.src = vendorUrl.createObjectURL(strem);
+		        video.play();
+		    }, function(error) {
+		        //error.code
+		        console.log(error);
+		        alert(error);
+		    });
+		    var that = this
+    		setTimeout(function(){
+    			that.actionP(null)
+    		},"1000");
+
+			//遮罩层
+			var cover = document.getElementById('cover');
+			var ctx = cover.getContext('2d');
+			cover.width = window.innerWidth;
+			cover.height = window.innerHeight;
+			ctx.fillStyle=" rgba(0,0,0, 0.5) ";
+			ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+			
+			ctx.save();
+			var codeboxW = cover.width/1.5;
+			ctx.translate((cover.width-codeboxW)/2,(cover.height-codeboxW*1.3)/2)
+			
+			var lineAnimate = document.getElementById('line-animate')
+			lineAnimate.style.top =(cover.height-codeboxW*1.3)/2 +'px';
+			lineAnimate.style.left =  (cover.width-codeboxW)/2 +'px';
+			lineAnimate.style.width = codeboxW +'px';
+			lineAnimate.style.height = codeboxW +'px';
+			
+			//扫码框四角
+			var borderW = codeboxW/8.5;
+			var borderX = codeboxW-borderW+2
+			ctx.beginPath();
+			ctx.fillStyle=" #2277da ";
+			ctx.fillRect(-2,-2,borderW,borderW)
+			ctx.closePath()
+			
+			ctx.beginPath();
+			ctx.fillStyle=" #2277da ";
+			ctx.fillRect(borderX,-2,borderW,borderW)
+			ctx.closePath()
+			
+			ctx.beginPath();
+			ctx.fillStyle=" #2277da ";
+			ctx.fillRect(borderX,borderX,borderW,borderW)
+			ctx.closePath()
+			
+			ctx.beginPath();
+			ctx.fillStyle=" #2277da ";
+			ctx.fillRect(-2,borderX,borderW,borderW)
+			ctx.closePath()
+			
+			
+			ctx.globalCompositeOperation="destination-out";
+			
+			//扫码框
+			ctx.beginPath();
+			ctx.fillStyle=" rgba(0,0,0, 1) ";
+			ctx.fillRect(0,0,codeboxW,codeboxW)
+			ctx.closePath()
+			
+			ctx.globalCompositeOperation="source-over";
+			
+			
+			ctx.restore()
+			var that = this
+			
+		
+    },
+    methods : {
+    ...mapActions(['queryPoleData']),
+    
+	//关闭摄像头
+	closeMedia(){
+		this.$router.push('/')
+	},
+    //定时器
+    actionP(data){
+    	var that = this
+    	if(data==null){
+    		this.Screenshot() 
+    	}else{
+    		if(data!=null & data!="error decoding QR Code"){//识别出数据
+    			alert(data)
+    			let dgh={
+    				dgh:data
+    			}
+    			this.$store.state.main_store.poleNum = dgh.dgh
+    			this.queryPoleData(dgh);
+        		this.$router.push('/')
+        	}else{//没有数据循环
+           		this.c++;
+               	if(this.c<30){
+               		setTimeout(function(){
+               			that.actionP(null)
+               		},500) 
+               	}else{
+               		alert('未能识别,请手动输入灯杆号')
+               	}
+//				let dgh={
+//					dgh:'100101112012'
+//				}
+//				this.$store.state.main_store.poleNum = dgh.dgh
+//				this.queryPoleData(dgh);
+//				this.$router.push('/')
+            }
+    	}
+    	
+   	},
+    
+    
+    Screenshot(){//截取图像
+   		 canvas.getContext('2d').drawImage(video, 0, 0, 400, 400);
+   		 var imgData = canvas.toDataURL("image/png");
+   		 this.load(imgData);
+   		 img.src=imgData;
+    },
+   ////////////////////////////////////////识别二维码////////////////////////////////////////////
+   
+		dragenter(e) {
+		  e.stopPropagation();
+		  e.preventDefault();
+		},
+		
+		dragover(e) {
+		  e.stopPropagation();
+		  e.preventDefault();
+		},
+		drop(e) {
+		  e.stopPropagation();
+		  e.preventDefault();
+		  var dt = e.dataTransfer;
+		  var files = dt.files;
+		},
+	
+		
+		load(name){
+			//识别二维码并回调方法
+			this.qrcode.callback = this.actionP;
+			this.qrcode.decode(name);
+		},
+	
+
+    }
+    
+}
+	
+   
+</script>
+
+<style scoped>
+		.code{
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+		}
+		#canvas{
+			display: none;
+		}
+		#img{
+			display: none;
+		}
+		.close{
+			
+			position: absolute;
+			right: .5rem;
+			top: 1rem;
+			z-index:10000;
+			color: white;
+			font-size: 1.2rem;
+		}
+		#cover{
+			position:absolute;
+			left:0;
+			top:0;
+			z-index:1000;
+		}
+		#line-animate{
+			position:absolute ;
+			overflow: hidden;
+		}
+		#line{
+			position: absolute;
+			top:-35px;
+			left: 0;
+			z-index: 10;
+			border-bottom: 1px solid #2277da;
+			background: linear-gradient(transparent, #2277da);
+			height: 35px;
+			width: 100%;
+			opacity: .8;
+			animation: linedown 1.5s ease-in-out 2s infinite;
+			
+		}
+		@keyframes linedown{
+			from{top: -35px;}
+			to{top:100%}
+		}
+</style>

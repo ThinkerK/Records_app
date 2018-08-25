@@ -1,0 +1,80 @@
+<template>
+	<div class="page">
+		<div class="map-font">
+			<p>lng: <span>{{center.lng}}</span></p>
+			<p>lat: <span>{{center.lat}}</span></p>
+		</div>
+		<div class="gis-box">
+			<baidu-map class="bm-view"  :center="center" :zoom="19" @ready="handler" @moveend="mapMoveend">
+				<bm-marker :position="point" :dragging="true" animation="BMAP_ANIMATION_BOUNCE"></bm-marker>
+			</baidu-map>
+		</div>
+		<div class="center-point"></div>
+	</div>
+</template>
+<script>
+
+//import BaiduMap from 'vue-baidu-map/components/Map/Map.vue'
+
+export default {
+  name: 'code',
+  data () {
+    return {
+    	point: {
+    		lng : 116.403479,
+    		lat : 39.915083
+    	},
+    	center: {
+    		lng : 0,
+    		lat : 0
+    	}
+    }
+  },
+  methods: {
+  	handler({BMap, map}){
+  		let that = this;
+  		let geolocation = new BMap.Geolocation();
+  		geolocation.getCurrentPosition(function(r){
+  			alert(r);
+  			that.center = {lng: r.longitude, lat: r.latitude};	//当前位置
+  		},{enableHighAccuracy: true});
+  	},
+  	mapMoveend(e) {
+      const {lng, lat} = e.target.getCenter()
+      this.center.lng = lng;
+      this.center.lat = lat;
+    }
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+	.page,
+	.gis-box,
+	.bm-view,
+	.map{
+		height: 100%;
+	}
+	.center-point{
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		margin: auto;
+		z-index: 100005;
+		width: 50px;
+		height: 50px;
+		background: url(../../assets/center_point.png) no-repeat;
+    	background-size: 100% 100%;
+	}
+	.map-font{
+		width: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 100006;
+		background: #fff;
+	}
+</style>

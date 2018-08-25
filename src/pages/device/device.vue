@@ -1,0 +1,674 @@
+<template>
+  <div class="page">
+  	
+  	<div class="model-box" v-show="sbModel">
+  		<div class="model-body">
+  			<div class="sb-box">
+  				<div class="model-close" v-on:click="closeModel">x</div>
+  				<div class="sb-body">
+  					<div class="sb-title">更换类型</div>
+  					<div class="list-box">
+  							<div class="check-box" v-for="(item,index) in sblxArr">
+				    			<input type="radio" :value="item.sblx" :id="'sb_check_'+index" name="lan"  v-on:click="choiceSb(item)"/>
+					  			<label class="check-title" :class="'pic'+item.sblx" :for="'sb_check_'+index" ></label>
+				    		</div>
+  					</div>
+  				</div>
+  				<div class="btn btn-block" v-on:click="checkSblx">确定</div>
+  			</div>
+  		</div>
+  	</div>
+  	
+    <header class="head">
+    	<div class="back-btn" v-on:click="goBack"></div>
+    	<div class="head-title">设备信息</div>
+    	<div class="edit">编辑</div>
+    </header>
+    
+    <div class="main">
+    	<div class="main-list">
+    		<div class="list-left">
+    			<div class="list-title">类型</div>
+    			<div class="list-icon" v-bind:class="'pic'+sblx"></div>
+    		</div>
+    		<div class="list-right" v-on:click="replaceSb">更换</div>
+    	</div>
+    	<div class="main-list">
+    		<div class="list-left">
+    			<div class="list-title">出厂编号</div>
+    		</div>
+    		<div class="list-right">
+    			<input type="text" name="" v-model="ccbh" class="ccbh-ipt"/>
+    		</div>
+    	</div>
+    	
+    	<div class="btn-ground">
+    		<div class="check-box">
+    			<input type="radio" value="" class="checkbox_lan" id="checkbox_lan" v-on:click="wkradio" name="wk"  v-bind:checked = "lanwkFlag" />
+	  			<label class="check-title" for="checkbox_lan" >LAN用网</label>
+    		</div>
+    		<div class="check-box">
+    			<input type="radio" value="" class="checkbox_458" id="checkbox_458" v-on:click="wkradio" name="wk" v-bind:checked = "ckwkFlag" />
+	  			<label class="check-title" for="checkbox_458" >458串口</label>
+    		</div>
+    		
+    		<div class="check-box">
+    			<input type="radio" value="" class="checkbox_jl" id="checkbox_jl" @click.stop="ydradio"  name="yd" v-bind:checked = "jlydFlag" />
+	  			<label class="check-title"  for="checkbox_jl">交流用电</label>
+    		</div>
+    		<div class="check-box">
+    			<input type="radio" value="" class="checkbox_zl" id="checkbox_zl" @click.stop="ydradio"  name="yd" v-bind:checked = "zlydFlag" />
+	  			<label class="check-title"  for="checkbox_zl">直流用电</label>
+    		</div>
+    		
+    		<div class="check-box">
+    			<input type="checkbox" value="" id="checkbox_yx" name="" />
+	  			<label class="check-title" for="checkbox_yx">遥信</label>
+    		</div>
+    		
+    		<div class="check-box">
+    			<input type="checkbox" value="" id="checkbox_poe" name="" />
+	  			<label class="check-title" for="checkbox_poe">POE用电</label>
+    		</div>
+    	</div>
+    	
+    	<div class="device-wrap">
+    		<div class="device-main">
+    			
+    			<div class="device-list">
+    				<div class="device-title">物联网关</div>	
+    				<div class="device">
+    					<div class="input-box">
+    						<span class="wgtext">{{wlwgNum}}</span>
+    					</div>
+    				</div>
+    			</div>
+    			
+    			
+    			<div class="device-list electro-ac" v-show="lanwkFlag" >
+    				<div class="device-title">LAN用网</div>	
+    				<div class="device">
+    					<div class="input-box">
+    						<div class="btn-ground btn-ground-xs">
+    							
+    							<div class="check-box" v-for = "(item,index) in wkData">
+					    			<input type="radio" :value="index" :id="'wk_check_'+index" name="lan"  v-on:click="lanchange(item.xmbh)"/>
+						  			<label class="check-title" :for="'wk_check_'+index" >{{ item.xmbh }}</label>
+					    		</div>
+					    		
+					    		
+	    						
+	    					</div>
+    					</div>
+    				</div>
+    			</div>
+    			
+    			<div class="device-list electro-ac" v-show="ckwkFlag" >
+    				<div class="device-title">485串口</div>	
+    				<div class="device">
+    					<div class="input-box">
+    						<div class="btn-ground btn-ground-xs">
+    							
+    							<div class="check-box" v-for = "(item,index) in wkData">
+					    			<input type="radio" :value="index" :id="'ck_check_'+index" name="ck"  v-on:click="ckchange(item.xmbh)"/>
+						  			<label class="check-title" :for="'ck_check_'+index" >{{ item.xmbh }}</label>
+					    		</div>
+	    						
+	    						
+	    					</div>
+    					</div>
+    				</div>
+    			</div>
+    			
+    			
+    			<div class="device-list electro-ac" v-show="zlydFlag" >
+    				<div class="device-title">直流用电</div>	
+    				<div class="device">
+    					<div class="input-box">
+    						<div class="btn-ground btn-ground-xs">
+    							
+    							<div class="check-box" v-for = "(item,index) in dkData">
+					    			<input type="radio" :value="index" :id="'zl_check_'+index" name="zl"  v-on:click="dkchange(item.xmbh)"/>
+						  			<label class="check-title" :for="'zl_check_'+index" >{{ item.xmbh }}</label>
+					    		</div>
+	    						
+	    						
+	    					</div>
+    					</div>
+    				</div>
+    			</div>
+    			
+    			<div class="device-list electro-ac" v-show="jlydFlag" >
+    				<div class="device-title">交流用电</div>	
+    				<div class="device">
+    					<div class="input-box">
+    						<div class="btn-ground btn-ground-xs">
+    							
+    							<div class="check-box" v-for = "(item,index) in dkData">
+					    			<input type="radio" :value="index" :id="'jl_check_'+index" name="jl"  v-on:click="dkchange(item.xmbh)"/>
+						  			<label class="check-title" :for="'jl_check_'+index" >{{ item.xmbh }}</label>
+					    		</div>
+	    						
+	    						
+	    					</div>
+    					</div>
+    				</div>
+    			</div>
+    			
+    		</div>
+    	</div>
+    	
+    </div>
+   	
+   	<div class="bottom-btn-box padding-top">
+    	<div class="btn btn-default cancel" @click="cancelClick" >取消</div>
+    	<div class="btn btn-blue" @click="replaceClick" >确定</div>
+    </div>
+   	
+  </div>
+</template>
+
+<script>
+	import { mapState } from 'vuex'
+	import { Toast } from 'mint-ui'
+	
+	export default {
+	  data () {
+	    return {
+	      
+	    }
+	  },
+	  computed:{
+			...mapState({		//取state里面的值
+				zlydFlag : state => state.device_store.zlydFlag,
+				jlydFlag : state => state.device_store.jlydFlag,
+				lanwkFlag : state => state.device_store.lanwkFlag,
+				ckwkFlag : state => state.device_store.ckwkFlag,
+				sbModel : state => state.device_store.sbModel,	//弹窗标识
+				sblx : state => state.device_store.sblx,						//设备类型
+				sblxArr : state => state.device_store.sblxArr,
+				wkData : state => state.device_store.wkData,
+				dkData : state => state.device_store.dkData,
+				ccbh : state => state.device_store.ccbh,				//出厂编号
+				wlwgNum : state => state.device_store.wlwgNum,				//资产编号
+				txlx : state => state.device_store.txlx
+			}),
+			ccbh : {	//出厂编号
+		    get() {
+		      return this.$store.state.device_store.ccbh;
+		    },
+		    set(val) {
+		      this.$store.commit('setCcbh', val);
+		    }
+		  }
+		},
+		mounted(){
+			let zcbh = (this.$store.state.device_store.wlwgNum).split("-")[0];
+			let data = {
+	  			zcbh : zcbh,
+	  			type : this.txlx,
+	  		}
+			this.$store.dispatch("getwkData",data);
+		},
+	  methods:{
+	  	goBack:function(){
+	  		window.history.back();
+	  	},
+	  	replaceSb:function(){	//替换设备类型
+	  		this.$store.commit("addsetsbModel",true);
+	  	},
+	  	closeModel:function(){	//关闭弹窗
+	  		this.$store.commit("addsetsbModel",false);
+	  	},
+	  	choiceSb:function(res){	//选择设备类型
+	  		this.$store.commit("setChoice",res);
+	  	},
+	  	checkSblx:function(){	//确定设备类型
+	  		let sblx = this.$store.state.device_store.choice;
+//	  		this.$store.commit("setSblx",sblx);
+	  		this.$store.commit("addsetsbModel",false);	//隐藏弹框
+	  	},
+	  	lanchange: function(res){	//lan口
+	  		this.$store.commit('setlan', res);
+	  	},
+	  	ckchange: function(res){	//串口
+	  		this.$store.commit('setck', res);
+	  	},
+	  	dkchange: function(res){	//电口
+	  		this.$store.commit('setdk', res);
+	  	},
+	  	wkradio: function(e){	//用网切换
+	  		let zcbh = (this.$store.state.device_store.wlwgNum).split("-")[0];
+	  		let data = {
+	  			zcbh : zcbh,
+	  			type : "",
+	  		}
+	  		if(e.currentTarget.className == "checkbox_lan"){	//lan网
+	  			let flag = {
+	  				lanwkFlag : true,	
+						ckwkFlag : false	
+	  			}
+	  			this.$store.commit('addsetywState', flag);
+	  			data.type = 2;
+	  			this.$store.commit('settxfs',2);
+	  		}else{	//458网
+	  			let flag = {
+	  				lanwkFlag : false,	
+						ckwkFlag : true	
+	  			}
+	  			this.$store.commit('addsetywState', flag);
+	  			data.type = 3;
+	  			this.$store.commit('settxfs',3);
+	  		}
+	  		this.$store.dispatch("getwkData",data);
+	  	},
+	  	ydradio: function(e){	//用电切换
+	  		let zcbh = (this.$store.state.device_store.wlwgNum).split("-")[0];
+	  		let data1 = {
+	  			zcbh : zcbh,
+	  			type : 2,
+	  		}
+	  		this.$store.dispatch("getydData",data1);
+	  		if(e.currentTarget.className == "checkbox_jl"){	//交流
+	  			let flag = {
+	  				zlydFlag : false,	
+						jlydFlag : true,	
+	  			}
+	  			this.$store.commit('addsetydState', flag);
+	  			this.$store.commit("setydlx",3);
+	  		}else{	//直流
+	  			let flag = {
+	  				zlydFlag : true,	
+						jlydFlag : false,	
+	  			}
+	  			this.$store.commit('addsetydState', flag);
+	  			this.$store.commit("setydlx",4);
+	  		}
+	  	},
+	  	replaceClick : function(){	//替换
+	  		debugger
+	  		let $dev  = this.$store.state.device_store;
+	  		let data = {
+	  			sblx : $dev.sblx,
+	  			sblxStr : $dev.sblxStr,
+	  			sbmc : $dev.sbmc,
+	  			txlx : $dev.txlx,
+	  			txfs : $dev.txfs,					//通讯方式
+					jdwlxh : $dev.jdwlxh,				//lan口
+					ckh : $dev.ckh,					//485串口
+					ydlx : $dev.ydlx,					//用电类型
+					kzhlh : $dev.kzhlh,					//电口
+					ccbh : $dev.ccbh,		//出厂编号
+					sswlwg : $dev.sswlwg
+	  		}
+//	  		this.$store.commit('setAddDevice',data);		//设置设备数据
+//	  		this.$store.commit("setsbFlag",true);		//设置设备保存状态
+			  this.$store.commit('updateDevice',data)    //修改设备数据
+				if($dev.sblx != ""){
+					this.$router.go(-1)
+				}else{
+					Toast("请选择设备类型");
+				}
+
+	  		
+	  	},
+	  	cancelClick : function(){	//取消替换按钮
+	  		this.$store.commit('setsbFlag',false);
+	  		window.history.back();
+	  	}
+	  	
+	  	
+	  }
+	  
+	}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+	.model-box{
+		height: 100%;
+		width: 100%;
+		background: rgba(0,0,0,0.6);	
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 9999;
+	}
+	.model-box .model-close{
+		font-size: 20px;
+		color: #000;
+		position: absolute;
+		top: 3%;
+		right: 3%;
+	}
+	.model-box .model-body{
+		width: 100%;
+		height: 14rem;
+		background: #fff;
+		position: absolute;
+		bottom: 0;
+		left: 0;
+	}
+	
+	
+	.btn-block{
+		width: 100% !important;
+		background: #217bea;
+		color: #fff;
+		font-size: 16px !important;
+		height: 1.2rem !important;
+		line-height: 1.2rem !important;
+	}
+	.sb-box{
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+	}
+	.sb-box .sb-body{
+		flex: 1;
+		overflow-y: auto;
+		padding: 0.80rem;
+		display: flex;
+		flex-direction: column;
+	}
+	.sb-title{
+		height: 0.5rem;
+		text-align: left;;
+		padding-left: 0.33rem;
+	}
+	.list-box{
+		flex: 1;
+		display: flex;
+		flex-wrap: wrap;
+		align-content: flex-start;
+	}
+	
+	.list-box .check-box{
+    width: 1.6rem;
+    height: 1.6rem;
+    line-height: 1.6rem;
+    text-align: center;
+    font-size: 12px;
+    color: #217bea;
+    position: relative;
+    margin: 0.33rem;
+	}
+	.list-box .check-box .check-title{
+    position: absolute;
+		top: 0;
+		left: 0;
+		display: block;
+		width: 100%;
+		height: 100%;
+		line-height: 1.6rem;
+		text-align: center;
+		font-size: 12px;
+		border: 1px solid #d1d1d1;
+	}
+	
+	
+	.main-list{
+		height: 1.40rem;
+		border-bottom: 1px solid #f7f7f7;
+		padding: 0 0.50rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		background: white;
+	}
+	 .list-left{
+		height: 100%;
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+	}
+	.main-list .list-right{
+		color: #217bea;
+	}
+	.list-right .ccbh-ipt{
+		border: 1px solid #d1d1d1;
+		height: .8rem;
+		
+	}
+	.main-list .list-left .list-icon{
+		width: 0.80rem;
+		height: 0.80rem;
+    margin-left: 0.60rem;
+    opacity:0.4;
+		filter:alpha(opacity=40)
+	}
+	.btn-ground{
+		padding: 0.3rem 0.50rem;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-start;
+		background: white;
+	}	
+	.btn-ground .btn{
+		width: 2.2rem;
+		height: 0.80rem;
+		line-height: 0.8rem;
+		text-align: center;
+		font-size: 12px;
+		border: 1px solid #d1d1d1;
+		margin: 0.12rem; 
+		color: #217bea;
+	}
+	.btn-ground .active{
+		background: #e7f2ff;
+		border: 1px solid #217bea;
+		color: #000;
+	}
+	.device-wrap{
+		padding: 0 0.50rem;
+		background: white;
+	}
+	.device-wrap .device-main{
+		background: #f7f7f7;
+		padding:.3rem 0;
+	}
+	.device-list{
+		display: flex;
+		justify-content: flex-start;
+	}
+	.device-list .device-title{
+		width: 2.50rem;
+		height: 1.20rem;
+		line-height: 1.20rem;
+	}
+	.device-list .device{
+		width: 7rem;
+	}
+	.device-list .device .input-box{
+		/*height: 1.20rem;*/
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+	}
+	.btn-ground-xs{
+		padding: 0;
+	}
+	.btn-ground-xs .btn{
+		width: 1rem;
+		height: 0.8rem;
+	} 
+	.input-box .btn-ground {
+		background: #f7f7f7;
+	}
+	.btn-ground-xs .check-box,
+	.btn-ground-xs .check-box .check-title{
+		width: 1rem;
+    height: 0.8rem;
+    background: white;
+	}
+	
+	.page{
+		width: 100%;
+	    height: 100%;
+	    display: flex;
+	    flex-direction: column;
+	}
+	.head{
+		height: 1.77rem; 
+		background: #0c1234;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.36rem 0.40rem 0.3rem 0.40rem;
+	}
+	.head .back-btn{
+		width: 0.40rem;
+		height: 0.62rem;
+		background: url(../../assets/back_bg.png) no-repeat;
+    	background-size: 100% 100%;
+	}
+	.head .head-title{
+		height: 0.50rem;
+		color: #fff;
+		font-size: 0.50rem;
+	}
+	.head .edit{
+		width: 0.90rem;
+		height: 0.50rem;
+		color: #fff;
+		font-size: 0.42rem;
+	}
+	
+	.padding-top{
+		padding-top: 1.22rem;
+	}
+	.bottom-btn-box{
+		background: #fff;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	.btn{
+		width: 4.65rem;
+		height: 1.00rem;
+		border: 1px solid #217bea;
+		font-size: 0.36rem;
+		line-height: 1.00rem;
+		text-align: center;
+	}
+	.btn-default{
+		background: #fff;
+		color: #217bea;
+	}
+	.btn-blue{
+		background: #217bea; 
+		color: #fff;
+	}
+	.cancel{
+		margin-right: 0.30rem;
+	}
+	
+	.box:last-of-type{
+		border-bottom: 1px solid #f7f7f7;
+	}
+	
+	/*复选框模拟组合按钮*/
+	
+	.check-box{
+		width: 2.2rem;
+		height: 0.80rem;
+		line-height: 0.8rem;
+		text-align: center;
+		font-size: 12px;
+		margin: 0.12rem;
+		color: #217bea;
+		position: relative;
+	}
+	.check-box input[type="checkbox"],
+	.check-box input[type="radio"]{
+		display: none;
+	}
+	.check-box .check-title{
+		position: absolute;
+		top: 0;
+		left: 0;
+		display: block;
+		width: 2.2rem;
+		height: 0.80rem;
+		line-height: 0.8rem;
+		text-align: center;
+		font-size: 12px;
+		border: 1px solid #d1d1d1;
+		color: #217bea;
+	}
+	.check-box input[type="checkbox"]:checked + label{
+		background: #e7f2ff;
+		border: 1px solid #217bea;
+		color: #000;
+	}
+	.check-box input[type="radio"]:checked + label{
+		background: #e7f2ff;
+		border: 1px solid #217bea;
+		color: #000;
+	}
+	.list-box .check-box input[type="radio"]:checked + label{
+		background: transparent;
+		border: 1px solid #217bea;
+	}
+	
+	.pic1{
+		background: url(../../assets/1pic.png) no-repeat center center !important;
+		background-size: 80% 80% !important;
+	}
+	.pic2{
+		background: url(../../assets/2pic.png) no-repeat center center !important;
+		background-size: 80% 80% !important;
+	}
+	.pic3{
+		background: url(../../assets/3pic.png) no-repeat center center !important;
+		background-size: 80% 80% !important;
+	}
+	.pic4{
+		background: url(../../assets/4pic.png) no-repeat center center !important;
+		background-size: 80% 80% !important;
+	}
+	.pic5{
+		background: url(../../assets/5pic.png) no-repeat center center !important;
+		background-size: 80% 80% !important;
+	}
+	.pic6{
+		background: url(../../assets/6pic.png) no-repeat center center !important;
+		background-size: 80% 80% !important;
+	}
+	.pic7{
+		background: url(../../assets/7pic.png) no-repeat center center !important;
+		background-size: 80% 80% !important;
+	}
+	.pic10{
+		background: url(../../assets/10pic.png) no-repeat center center !important;
+		background-size: 80% 80% !important;
+	}
+	
+	.wgtext{
+    line-height: 1.20rem;
+	}
+	
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

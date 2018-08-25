@@ -1,0 +1,295 @@
+<template>
+  <div class="main">
+    <header class="head">
+    	<div class="back-btn"></div>
+    	<div class="head-title">扫码测试</div>
+    	<div class="edit"></div>
+    </header>
+    
+   
+    
+    <div class="scan-code-wrap">
+    	<div class="code-box" v-on:click="code()">
+    		<div class="code-icon"></div>
+    		<div class="code-font">扫码/拍照</div>
+    	</div>
+    </div>
+    
+   
+    
+  </div>
+</template>
+
+<script>
+export default {
+  data () {
+    return {
+      
+    }
+  },
+  mounted() {
+  	
+  },
+  methods: {
+    code: function () {
+      console.log("8888888888888");
+//    	scan = new plus.barcode.Barcode('bcid');
+//		scan.onmarked = onmarked; 
+    }
+    
+    
+  }
+  
+  
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+	
+	.modal-box{
+		display: none;
+		width: 100%;
+		height: 100%;
+		background: rgba(0,0,0,0.5);
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 10001;
+	}
+	.modal-show{
+		display: block;
+	}
+	.modal-box .modal-main{
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		margin:auto;
+		width: 7.0rem;
+		height: 4.5rem;
+		background: #fff;
+		border-radius: 5px;
+		display: flex;
+		justify-content: space-between;
+		flex-direction: column;
+		align-items: center;
+	}
+	.modal-main .modal-body{
+		flex: 1;
+		padding: 1.2rem 1.2rem 0 1.2rem;
+	}
+	.modal-main .modal-btn{
+		height: 1.3rem;
+		width: 100%;
+		border-top: 1px solid #C0C0C0;
+		border-bottom: 1px solid #C0C0C0; 
+		border-radius: 0 0 5px 5px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+	.modal-btn .btn-see{
+		border-right: 1px solid #C0C0C0;
+	}
+	.modal-btn .btn-see,
+	.modal-btn .btn-sure{
+		height: 100%;
+		width: 50%;
+		line-height: 1.3rem;
+	}
+	
+	
+	
+	.main{
+    height: 100%;
+    background: url(../../assets/index_bg.png) no-repeat;
+    background-size: auto 100%;
+    background-position-y: 1.5rem;
+	}
+	.head{
+		height: 1.77rem; 
+		background: #0c1234;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.36rem 0.40rem 0.3rem 0.40rem;
+	}
+	.head .back-btn{
+		width: 0.40rem;
+		height: 0.62rem;
+		background: url(../../assets/back_bg.png) no-repeat;
+    background-size: 100% 100%;
+	}
+	.head .head-title{
+		width: 2.10rem;
+		height: 0.50rem;
+		color: #fff;
+		font-size: 0.50rem;
+	}
+	.head .edit{
+		width: 0.90rem;
+		height: 0.50rem;
+		color: #fff;
+		font-size: 0.42rem;
+	}
+
+	.add-gis .list-gis-wrap{
+		display: block;
+	}
+	.list-gis-wrap{
+		display: none;
+	}
+	.list-gis{
+		height: 1.40rem;
+		padding: 0 0.05rem 0 0.54rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}	
+	.list-gis .gis-flag{
+		width: 2.20rem;
+		height: 100%;
+		display: flex;
+		align-items: center;
+	}
+	.list-gis .gis-flag .icon{
+		width: 0.40rem;
+		height: 0.4rem;
+		margin-right: 0.35rem;
+		background: url(../../assets/gis_check.png) no-repeat;
+		background-size: 100% 100%;
+	}
+	.list-gis .gis-flag .title{
+    font-size: 0.20rem;
+    color: #fff;
+	}
+	.list-gis .gis-btn{
+		width: 1.70rem;
+		height: 0.55rem;
+		border: 1px solid #fff;
+		border-radius: 0.05rem;
+		background: url(../../assets/gis_btn.png) no-repeat;
+		background-size: 100% 100%;
+	}
+	
+	
+	.from-box{
+		padding: 1.35rem 0.70rem 0 0.70rem;
+		margin-bottom: 2.80rem;
+	}
+	.add-gis{
+		padding: 0.35rem 0.70rem 0 0.70rem;
+		margin-bottom: 2.00rem;
+	}
+	.from-box .list{
+		height: 1.38rem;
+		margin-bottom: 0.20rem;
+		background: rgba(149,149,149,0.1);
+		padding: 0 0.72rem 0 0.54rem;
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+	}
+	.list .list-title{
+		width: 2.00rem;
+		height: 100%;
+		display: flex;
+		align-items: center;
+	}
+	.list .list-title .check{
+		width: 0.40rem;
+		height: 0.40rem;
+		margin-right: 0.35rem;
+		background: url(../../assets/check.png) no-repeat;
+		background-size: 100% 100%;
+	}
+	.list .list-title .active{
+		background: url(../../assets/checked.png) no-repeat;
+		background-size: 100% 100%;
+	}
+	.list .list-title .title{
+		font-size: 0.20rem;
+		color: #bbbcc2;
+	}
+	
+	.list-input{
+		color: #fff;
+		font-size: 0.34rem;
+	}
+	.btn{
+		width: 5.00rem;
+		height: 1.05rem;
+		border: 1px solid #fff;
+		line-height: 1.05rem;
+		text-align: center;
+		margin: 0 auto;
+		font-size: 0.44rem;
+		color: #fff;
+	}
+	
+	
+	.scan-code-wrap{
+    position: fixed;
+    left: -8%;
+    bottom: 0;
+    z-index: 1001;
+    width: 116%;
+    height: 6.10rem;
+    background: #fff;
+    border-radius: 50% 50% 0 0;
+    display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	.scan-code-wrap .code-box{
+		width: 3.45rem;
+    height: 3.45rem;
+    background: #2277da;
+    border-radius: 50%;
+    padding-top: 0.85rem;
+	}
+	.scan-code-wrap .code-box .code-icon{
+		width: 0.70rem;
+    height: 0.70rem;
+    background: url(../../assets/scan_code.png) no-repeat;
+		background-size: 100% 100%;
+		margin: 0 auto;
+		margin-bottom: 0.5rem;
+	}
+	.code-font{
+		color: #fff;
+		font-size: 0.36rem;
+	}
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
