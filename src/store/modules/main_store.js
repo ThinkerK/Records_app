@@ -1,6 +1,7 @@
 import axios from 'axios'
 import Ajax from '../axios/axiosConfig.js'
 import { Toast } from 'mint-ui'
+import { mapMutations } from '../../../node_modules/vuex';
 
 const state = {	//定义常量，资源库
 	lng : "",			//经度
@@ -89,6 +90,12 @@ const actions = {
 }
 
 const mutations = {	
+	addImgs(state,res){ //添加img
+		state.imgsArr.push(res)
+	},
+	setImgs(state,res){ //获取图片
+		state.imgsArr = res
+	},
 	setPoleNum(state,res){	//设置灯杆号
 		state.poleNum = res;
 	},

@@ -128,7 +128,7 @@
 </template>
 
 <script>
-	import { mapState } from 'vuex'
+	import { mapState,mapMutations } from 'vuex'
 	import { Indicator } from 'mint-ui'
 	import { Toast } from 'mint-ui'
 	import { isNull } from '../../../static/js/common.js'
@@ -137,23 +137,17 @@
 	export default {
 		data() {
 			return {
-				liu: "wei",
 				docmHeight: document.documentElement.clientHeight,  //默认屏幕高度
 				showHeight: document.documentElement.clientHeight,   //实时屏幕高度
 				hidshow: true,  //显示或者隐藏footer
-				imgsArr: [{
-					src: 'https://gpic.qpic.cn/gbar_pic/2aqluyraXicEfqicaK3aV4iaib5icib78qF0eFxokIEKSewIg8hQW0kiavCQg/1000'
-				}],
 				actions: [{
 					name: '拍照',
-					method: this.getCamera	// 调用methods中的函数
+					method: this.getCamera
 				}, {
 					name: '从相册中选择',
-					method: this.getLibrary	// 调用methods中的函数
+					method: this.getLibrary
 				}],
-				// action sheet 默认不显示，为false。操作sheetVisible可以控制显示与隐藏
-				sheetVisible: false,
-				poleNum:''
+				sheetVisible: false,// action sheet 默认不显示，为false。操作sheetVisible可以控制显示与隐藏
 			}
 		},
 		filters: {	//判断网口类型
@@ -193,7 +187,7 @@
 				gatewayNum: state => state.main_store.gatewayNum,		//网关数量
 				deviceData: state => state.main_store.deviceData,		//新增设备
 				codeHideFlag: state => state.main_store.codeHideFlag,	//隐藏搜索框
-
+				imgsArr: state => state.main_store.imgsArr
 			}),
 			poleNum: {	//灯杆号
 				get() {
@@ -205,6 +199,7 @@
 			}
 		},
 		methods: {
+			...mapMutations(['addImgs']),
 			actionSheet: function () {
 				this.sheetVisible = true;
 			},
@@ -213,13 +208,13 @@
 				plus.io.resolveLocalFileSystemURL(url, function (entry) {
 					entry.file(function (file) {
 						var fileReader = new plus.io.FileReader();
-						console.log(fileReader)
 						fileReader.readAsDataURL(file);
 						fileReader.onloadend = function (e) {
 							var picUrl = e.target.result.toString();
-							that.imgsArr.push({
-								src: picUrl
-							})
+							var imgItem = {
+								src:picUrl
+							}
+							that.addImgs(imgItem)
 						}
 					});
 				});
