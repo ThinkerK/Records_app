@@ -2,8 +2,9 @@ import axios from 'axios'
 import Ajax from '../axios/axiosConfig.js'
 
 const state = {	//定义常量，资源库
-	jlydFlag : true,		//交流用电标识
+	jlydFlag : false,		//交流用电标识
 	zlydFlag : false,		//直流用电标识
+	poeydFlag : true,		//poe用电
 	
 	lanwkFlag : true,		//lan网标识
 	ckwkFlag : false,		//串口标识
@@ -13,7 +14,7 @@ const state = {	//定义常量，资源库
 	sbmc: "",				//设备名称
 	ccbh : "",				//出厂编号
 	wlwgNum : "",				//资产编号
-	sswlwg : '',
+	sswlwg : '',			//所属物联网关
 	sblxArr:[
 		{"sblx":1,"sbmc":"ap"},
 		{"sblx":2,"sbmc":"摄像头"},
@@ -31,8 +32,8 @@ const state = {	//定义常量，资源库
 	txfs : "2",					//通讯方式
 	jdwlxh : "",				//lan口
 	ckh : "",					//485串口
-	ydlx : "3",					//用电类型
-	kzhlh : ""					//电口
+	ydlx : "2",					//用电类型
+	kzhlh : "0"					//电口
 	
 	
 }
@@ -54,13 +55,24 @@ const actions = {
 const mutations = {	//改变state里面的数据
 	
 	selectSswlwg(state,index){
-		
+		let zcbh = index.substring(0,7);
+			let data = {
+	  			zcbh : zcbh,
+	  			type : 1,
+	  		}
+			this.dispatch("getwkData",data);
+			let data1 = {
+				zcbh:zcbh,
+				type : 1
+			}
+			this.dispatch("getydData",data1);
 		state.sswlwg = index
 	},
 	
 	addsetydState(state,res){		//用电切换
 		state.zlydFlag = res.zlydFlag;
 		state.jlydFlag = res.jlydFlag;
+		state.poeydFlag = res.poeydFlag
 	},
 	addsetywState(state,res){		//用网切换
 		state.lanwkFlag = res.lanwkFlag;
@@ -104,13 +116,13 @@ const mutations = {	//改变state里面的数据
 	setwlwgNum(state,res){	//设置物联网关号
 		state.wlwgNum = res;
   		let data = {
-  			zcbh : (state.wlwgNum).split("-")[0],
+  			zcbh : (state.wlwgNum).substring(0,7),
   			type : "1"
   		}
 		this.dispatch("getwkData",data);
 		
   		let data1 = {
-  			zcbh : (state.wlwgNum).split("-")[0],
+  			zcbh : (state.wlwgNum).substring(0,7),
   			type : 3,
   		}
   		this.dispatch("getydData",data1);

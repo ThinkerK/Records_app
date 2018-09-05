@@ -71,13 +71,17 @@
         if (!window.plus) return;
         scan.cancel();
         scan.close();
-        this.$router.push('/')
+        window.history.back();
       }
     },
     mounted() {
       this.startRecognize();
       this.startScan();
-    }
+    },
+    beforeDestroy() {
+      scan.cancel();
+      scan.close();
+    },
   }
 </script>
 <style scoped>

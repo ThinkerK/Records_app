@@ -4,7 +4,7 @@
   	<div class="model-box" v-show="sbModel">
   		<div class="model-body">
   			<div class="sb-box">
-  				<div class="model-close" v-on:click="closeModel">x</div>
+  				<div class="model-close" v-on:click="closeModel">×</div>
   				<div class="sb-body">
   					<div class="sb-title">更换类型</div>
   					<div class="list-box">
@@ -14,7 +14,7 @@
 				    		</div>
   					</div>
   				</div>
-  				<div class="btn btn-block" v-on:click="checkSblx">确定</div>
+  				<div class="btn btn-block" v-on:click="checkSblx">确 定</div>
   			</div>
   		</div>
   	</div>
@@ -22,16 +22,16 @@
     <header class="head">
     	<div class="back-btn" v-on:click="goBack"></div>
     	<div class="head-title">设备信息</div>
-    	<div class="edit">编辑</div>
+    	<div class="edit"></div>
     </header>
-    
+	<div style="flex: 1">
     <div class="main">
     	<div class="main-list">
     		<div class="list-left">
     			<div class="list-title">类型</div>
     			<div class="list-icon" v-bind:class="'pic'+sblx"></div>
     		</div>
-    		<div class="list-right" v-on:click="replaceSb">更换</div>
+    		<div class="list-right" v-on:click="replaceSb">选择</div>
     	</div>
     	<div class="main-list">
     		<div class="list-left">
@@ -59,17 +59,17 @@
     		<div class="check-box">
     			<input type="radio" value="" class="checkbox_zl" id="checkbox_zl" @click.stop="ydradio"  name="yd" v-bind:checked = "zlydFlag" />
 	  			<label class="check-title"  for="checkbox_zl">直流用电</label>
+			</div>
+			<div class="check-box">
+    			<input type="radio" value="" class="checkbox_poe" id="checkbox_poe" @click.stop="ydradio" name="yd" v-bind:checked = "poeydFlag"/>
+	  			<label class="check-title" for="checkbox_poe">POE用电</label>
     		</div>
     		
     		<div class="check-box">
     			<input type="checkbox" value="" id="checkbox_yx" name="" />
 	  			<label class="check-title" for="checkbox_yx">遥信</label>
     		</div>
-    		
-    		<div class="check-box">
-    			<input type="checkbox" value="" id="checkbox_poe" name="" />
-	  			<label class="check-title" for="checkbox_poe">POE用电</label>
-    		</div>
+    	
     	</div>
     	
     	<div class="device-wrap">
@@ -99,9 +99,6 @@
 					    			<input type="radio" :value="index" :id="'wk_check_'+index" name="lan"  v-on:click="lanchange(item.xmbh)"/>
 						  			<label class="check-title" :for="'wk_check_'+index" >{{ item.xmbh }}</label>
 					    		</div>
-					    		
-					    		
-	    						
 	    					</div>
     					</div>
     				</div>
@@ -152,8 +149,6 @@
 					    			<input type="radio" :value="index" :id="'jl_check_'+index" name="jl"  v-on:click="dkchange(item.xmbh)"/>
 						  			<label class="check-title" :for="'jl_check_'+index" >{{ item.xmbh }}</label>
 					    		</div>
-	    						
-	    						
 	    					</div>
     					</div>
     				</div>
@@ -168,7 +163,7 @@
     	<div class="btn btn-default cancel" @click="cancelClick" >取消</div>
     	<div class="btn btn-blue" @click="replaceClick" >确定</div>
     </div>
-   	
+	</div>
   </div>
 </template>
 
@@ -180,21 +175,27 @@
 	  data () {
 	    return {
 	      downBtnClick:false,
-	      txlx:2
+	      txlx:1
 	    }
 	  },
 	  mounted(){
-			let zcbh = (this.gatewayArr[0]).split("-")[0];
+			let zcbh = (this.gatewayArr[0]).substring(0,7);
 			let data = {
 	  			zcbh : zcbh,
 	  			type : this.txlx,
 	  		}
 			this.$store.dispatch("getwkData",data);
+			let data1 = {
+				zcbh:zcbh,
+				type : 1
+			}
+			this.$store.dispatch("getydData",data1);
 		},
 	  computed:{
 			...mapState({		//取state里面的值
 				zlydFlag : state => state.addDevice_store.zlydFlag,
 				jlydFlag : state => state.addDevice_store.jlydFlag,
+				poeydFlag: state => state.addDevice_store.poeydFlag,
 				lanwkFlag : state => state.addDevice_store.lanwkFlag,
 				ckwkFlag : state => state.addDevice_store.ckwkFlag,
 				sbModel : state => state.addDevice_store.sbModel,	//弹窗标识
@@ -256,7 +257,7 @@
 	  		this.$store.commit('setdk', res);
 	  	},
 	  	wkradio: function(e){	//用网切换
-	  		let zcbh = (this.$store.state.addDevice_store.wlwgNum).split("-")[0];
+	  		let zcbh = (this.$store.state.addDevice_store.wlwgNum).substring(0,7);
 	  		let data = {
 	  			zcbh : zcbh,
 	  			type : "",
@@ -267,7 +268,7 @@
 					ckwkFlag : false	
 	  			}
 	  			this.$store.commit('addsetywState', flag);
-	  			data.type = 2;
+	  			data.type = 1;
 	  			this.$store.commit('settxfs',2);
 	  		}else{	//458网
 	  			let flag = {
@@ -275,33 +276,44 @@
 						ckwkFlag : true	
 	  			}
 	  			this.$store.commit('addsetywState', flag);
-	  			data.type = 3;
+	  			data.type = 2;
 	  			this.$store.commit('settxfs',3);
 	  		}
 	  		this.$store.dispatch("getwkData",data);
 	  	},
 	  	ydradio: function(e){	//用电切换
-	  		let zcbh = (this.$store.state.addDevice_store.wlwgNum).split("-")[0];
+	  		let zcbh = (this.$store.state.addDevice_store.wlwgNum).substring(0,7);
 	  		let data1 = {
 	  			zcbh : zcbh,
-	  			type : 3,
+	  			type : 1,
 	  		}
 	  		this.$store.dispatch("getydData",data1);
 	  		if(e.currentTarget.className == "checkbox_jl"){	//交流
 	  			let flag = {
 	  				zlydFlag : false,	
-						jlydFlag : true,	
+					jlydFlag : true,	
+					poeydFlag : false	
 	  			}
 	  			this.$store.commit('addsetydState', flag);
 	  			this.$store.commit("setydlx",3);
-	  		}else{	//直流
+	  		}else if(e.currentTarget.className == "checkbox_zl"){	//直流
 	  			let flag = {
 	  				zlydFlag : true,	
-						jlydFlag : false,	
+					jlydFlag : false,	
+					poeydFlag : false	
 	  			}
 	  			this.$store.commit('addsetydState', flag);
 	  			this.$store.commit("setydlx",4);
-	  		}
+	  		}else{
+				let flag = {
+	  				zlydFlag : false,	
+					jlydFlag : false,	
+					poeydFlag : true	
+	  			}
+	  			this.$store.commit('addsetydState', flag);
+				this.$store.commit("setydlx",2);
+				this.$store.commit('setdk', 0)
+			}
 	  	},
 	  	replaceClick : function(){	//替换
 	  		let $dev  = this.$store.state.addDevice_store;
@@ -311,13 +323,13 @@
 	  			sbmc : $dev.sbmc,
 	  			txlx : $dev.txfs,
 	  			txfs : $dev.txfs,					//通讯方式
-					jdwlxh : $dev.jdwlxh,				//lan口
-					ckh : $dev.ckh,					//485串口
-					ydlx : $dev.ydlx,					//用电类型
-					kzhlh : $dev.kzhlh,					//电口
-					ccbh : $dev.ccbh,				//出厂编号
-					sswlwg : $dev.sswlwg?$dev.sswlwg:this.gatewayArr[0],
-					id : false
+				jdwlxh : $dev.jdwlxh,				//lan口
+				ckh : $dev.ckh,					//485串口
+				ydlx : $dev.ydlx,					//用电类型
+				kzhlh : $dev.kzhlh,					//电口
+				ccbh : $dev.ccbh,				//出厂编号
+				sswlwg : $dev.sswlwg?$dev.sswlwg:this.gatewayArr[0],
+				id : false
 	  		}
 	  		this.$store.commit('setAddDevice',data);		//设置设备数据
 //	  		this.$store.commit("setsbFlag",true);		//设置设备保存状态
@@ -342,13 +354,13 @@
 		height: 100%;
 		width: 100%;
 		background: rgba(0,0,0,0.6);	
-		position: fixed;
+		position: absolute;
 		top: 0;
 		left: 0;
 		z-index: 9999;
 	}
 	.model-box .model-close{
-		font-size: 20px;
+		font-size: 0.9rem;
 		color: #000;
 		position: absolute;
 		top: 3%;
@@ -366,11 +378,11 @@
 	
 	.btn-block{
 		width: 100% !important;
-		background: #217bea;
-		color: #fff;
-		font-size: 16px !important;
-		height: 1.2rem !important;
-		line-height: 1.2rem !important;
+    background: #217bea;
+    color: #fff;
+    font-size: 0.55rem !important;
+    height: 1.4rem !important;
+    line-height: 1.4rem !important;
 	}
 	.sb-box{
 		height: 100%;
@@ -385,26 +397,28 @@
 		flex-direction: column;
 	}
 	.sb-title{
-		height: 0.5rem;
+		height: 0.6rem;
 		text-align: left;;
 		padding-left: 0.33rem;
+		line-height: 0.6rem
 	}
 	.list-box{
 		flex: 1;
 		display: flex;
 		flex-wrap: wrap;
 		align-content: flex-start;
+		margin-top: 0.3rem
 	}
 	
 	.list-box .check-box{
-    width: 1.6rem;
-    height: 1.6rem;
+		width: 2.04rem;
+    height: 2.04rem;
     line-height: 1.6rem;
     text-align: center;
     font-size: 12px;
     color: #217bea;
     position: relative;
-    margin: 0.33rem;
+    margin: 0.13rem;
 	}
 	.list-box .check-box .check-title{
     position: absolute;
@@ -415,7 +429,7 @@
 		height: 100%;
 		line-height: 1.6rem;
 		text-align: center;
-		font-size: 12px;
+		font-size: 0.4rem;
 		border: 1px solid #d1d1d1;
 	}
 	.input-box .btn-ground{
@@ -442,14 +456,14 @@
 	}
 	.list-right .ccbh-ipt{
 		border: 1px solid #d1d1d1;
-		height: 0.8rem;
+		height: 1rem;
 		outline:none;
 	}
 	.main-list .list-left .list-icon{
-		width: 0.80rem;
-		height: 0.80rem;
+		width: 1.20rem;
+    height: 1.2rem;
     margin-left: 0.60rem;
-    opacity:0.4;
+    opacity:0.6;
 		filter:alpha(opacity=40)
 	}
 	.btn-ground{
@@ -487,8 +501,8 @@
 		justify-content: flex-start;
 	}
 	.device-list .device-title{
-		width: 2.50rem;
-		height: 1.20rem;
+		width: 2.60rem;
+		height: 1.60rem;
 		line-height: 1.20rem;
 	}
 	.device-list .device{
@@ -509,8 +523,8 @@
 	} 
 	.btn-ground-xs .check-box,
 	.btn-ground-xs .check-box .check-title{
-		width: 1rem;
-    height: 0.8rem;
+		width: 1.2rem;
+    height: 1rem;
     background: white;
 	}
 	
@@ -535,9 +549,10 @@
     	background-size: 100% 100%;
 	}
 	.head .head-title{
-		height: 0.50rem;
-		color: #fff;
-		font-size: 0.50rem;
+		height: 0.6rem;
+    color: #fff;
+    font-size: 0.6rem;
+    line-height: 0.6rem;
 	}
 	.head .edit{
 		width: 0.90rem;
@@ -557,11 +572,11 @@
 	}
 	.btn{
 		width: 4.65rem;
-		height: 1.00rem;
-		border: 1px solid #217bea;
-		font-size: 0.36rem;
-		line-height: 1.00rem;
-		text-align: center;
+    height: 1.20rem;
+    border: 1px solid #217bea;
+    font-size: 0.55rem;
+    line-height: 1.20rem;
+    text-align: center;
 	}
 	.btn-default{
 		background: #fff;
@@ -590,6 +605,7 @@
 		margin: 0.12rem;
 		color: #217bea;
 		position: relative;
+		margin-bottom: 0.3rem;
 	}
 	.check-box input[type="checkbox"],
 	.check-box input[type="radio"]{
@@ -600,11 +616,11 @@
 		top: 0;
 		left: 0;
 		display: block;
-		width: 2.2rem;
-		height: 0.80rem;
-		line-height: 0.8rem;
+		width: 2.3rem;
+		height: 1rem;
+		line-height: 1rem;
 		text-align: center;
-		font-size: 12px;
+		font-size: 0.5rem;
 		border: 1px solid #d1d1d1;
 		color: #217bea;
 	}
@@ -657,21 +673,21 @@
 	}
 	
 	.device-list .select-box{
-		width: 4rem;
-		position: relative;
-		top: 0.2rem;
-		left: 0.1rem;
-    height: 0.80rem;
-    line-height: 0.8rem;
+		width: 6rem;
+    position: relative;
+    top: 0.2rem;
+    left: 0.1rem;
+    height: 1rem;
+    line-height: 1rem;
     text-align: left;
-    font-size: 12px;
+    font-size: 0.55rem;
     border: 1px solid #d1d1d1;
     color: #217bea;
     background: white;
     padding-left: 0.2rem;
 	}
 	.select-box .wlwg-list{
-		width: 4rem;
+		width: 5rem;
 		position: absolute;
 		top: 0.8rem;
 		left: -1px;
@@ -684,12 +700,12 @@
 		padding-left: 0.2rem;
 	}
 	.select-box .down-btn{
-		width:0.8rem;
+		width:1rem;
 		position: absolute;
 		right: 0;
 		top: -1px;
 		border-left: 1px solid #d1d1d1;
-		height: 0.8rem;
+		height: 1rem;
 	}
 	.down-btn:before{
 		content: '';

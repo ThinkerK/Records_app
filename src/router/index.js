@@ -43,12 +43,11 @@ export default new Router({
       meta: {index: 1},
       component: _import("code/h5plus")
     },
-    {
-      path: '/preview',
-      name: 'preview',
-      meta: {index: 1},
-      component: _import("preview/preview")
-    }
+    // {
+    //   path: '/baidugis',
+    //   meta: {index: 1},
+    //   component: _import("baiduGis/baidu_gis")
+    // }
   ]
 })
 

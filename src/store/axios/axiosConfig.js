@@ -15,6 +15,9 @@ export default {
 	saveGateway(data){		//保存物联网关信息
 		return fetch("/dawhAppController/mxmx/saveWlwgXx",data)
 	},
+	saveGlq(data){		//保存用电管理器信息
+		return fetch("/dawhAppController/mxmx/saveYdglqXx",data)
+	},
 	saveDevice(data){	//保存设备
 		return fetch("/dawhAppController/mxmx/saveJrsbXx",data)
 	},
@@ -25,11 +28,6 @@ export default {
 		return fetch('/dawhAppController/mxmx/queryPictureByDgId',data)
 	},
 	saveTp(data){	//保存实拍图片
-		return fetch('/dawhController/saveTp',data)
+		return fetch('/Uploadmxmx/defaultPathUpload',data)
 	}
-	
-
-	
-	
-	
 }

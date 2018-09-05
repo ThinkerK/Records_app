@@ -3,7 +3,7 @@
     <header class="head">
     	<div class="back-btn" v-on:click="goBack"></div>
     	<div class="head-title">数据召测结果</div>
-    	<div class="edit">编辑</div>
+    	<div class="edit"></div>
     </header>
     <div class="main" id="main">
     	<div class="txt-box">
@@ -29,7 +29,7 @@
 <script>
 
 import { mapState } from 'vuex'
-import youdian from '@/assets/gis_youdian_icon.png'
+import youdian from '@/assets/light_on.png'
 import wode from '@/assets/position.png'
 import { Toast } from 'mint-ui'
 
@@ -72,6 +72,7 @@ export default {
 		})
 	},
 	mounted() {	//安装；编译好的html挂载到页面，执行一次
+	var wt=plus.nativeUI.showWaiting('正在定位...')
 	let mainbox = document.getElementById('main');
 	let mapbox = document.getElementById('allmap');
 	mapbox.style.height = mainbox.offsetHeight + 'px';
@@ -88,9 +89,9 @@ export default {
     
     // 创建标注,添加Marker
 		function addMarker(point){
-			let pic = new BMap.Icon(youdian, new BMap.Size(38, 42),  {imageOffset : new BMap.Size(0,0)});
+			let pic = new BMap.Icon(youdian, new BMap.Size(32, 30),  {imageOffset : new BMap.Size(0,0)});
 			let marker = new BMap.Marker(point,{icon : pic});	//添加标注
-		  map.addOverlay(marker);
+		  	map.addOverlay(marker);
 		}
 		
 		
@@ -109,6 +110,7 @@ export default {
 			var pointArr = [];
 			pointArr.push(ggpoint);
 			convertor.translate(pointArr, 3, 5, function(point){
+				wt.close()
 				let picon = new BMap.Icon(wode, new BMap.Size(22, 22),  {imageOffset : new BMap.Size(0,0)});
 				var marker = new BMap.Marker(point.points[0],{icon: picon});
 				map.addOverlay(marker);
@@ -174,21 +176,21 @@ export default {
 	}
 	.txt-box{
 		width: 100%;
-		height: 1.00rem;
+		height: 1.20rem;
 		position: absolute;
 		top: 0;
 		left: 0;
 		z-index: 1009;
 		background: rgba(245,168,88,0.6);
-		padding: 0 1.00rem;
+		padding: 0 0.50rem;
 		display: flex;
 	}
 	.txt-box .txt{
 		width: 50%;
-		line-height: 1.00rem;
+		line-height: 1.20rem;
 		color: #fff;
 		text-align: left;
-		font-size: 12px;
+		font-size: 0.5rem;
 	}
 	.bottom-btn-box{
 		height: 1.95rem; 
@@ -199,10 +201,10 @@ export default {
 	}
 	.btn{
 		width: 4.65rem;
-		height: 1.00rem;
+		height: 1.20rem;
 		border: 1px solid #217bea;
-		font-size: 0.36rem;
-		line-height: 1.00rem;
+		font-size: 0.55rem;
+		line-height: 1.20rem;
 		text-align: center;
 	}
 	.btn-default{
@@ -231,9 +233,10 @@ export default {
     background-size: 100% 100%;
 	}
 	.head .head-title{
-		height: 0.50rem;
+		height: 0.60rem;
 		color: #fff;
-		font-size: 0.50rem;
+		font-size: 0.60rem;
+		line-height: 0.6rem
 	}
 	.head .edit{
 		width: 0.90rem;

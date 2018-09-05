@@ -4,7 +4,7 @@
   	<div class="model-box" v-show="sbModel">
   		<div class="model-body">
   			<div class="sb-box">
-  				<div class="model-close" v-on:click="closeModel">x</div>
+  				<div class="model-close" v-on:click="closeModel">×</div>
   				<div class="sb-body">
   					<div class="sb-title">更换类型</div>
   					<div class="list-box">
@@ -14,7 +14,7 @@
 				    		</div>
   					</div>
   				</div>
-  				<div class="btn btn-block" v-on:click="checkSblx">确定</div>
+  				<div class="btn btn-block" v-on:click="checkSblx">确 定</div>
   			</div>
   		</div>
   	</div>
@@ -22,16 +22,16 @@
     <header class="head">
     	<div class="back-btn" v-on:click="goBack"></div>
     	<div class="head-title">设备信息</div>
-    	<div class="edit">编辑</div>
+    	<div class="edit"></div>
     </header>
-    
+    <div style="flex: 1">
     <div class="main">
     	<div class="main-list">
     		<div class="list-left">
     			<div class="list-title">类型</div>
     			<div class="list-icon" v-bind:class="'pic'+sblx"></div>
     		</div>
-    		<div class="list-right" v-on:click="replaceSb">更换</div>
+    		<div class="list-right" v-on:click="replaceSb">选择</div>
     	</div>
     	<div class="main-list">
     		<div class="list-left">
@@ -60,16 +60,16 @@
     			<input type="radio" value="" class="checkbox_zl" id="checkbox_zl" @click.stop="ydradio"  name="yd" v-bind:checked = "zlydFlag" />
 	  			<label class="check-title"  for="checkbox_zl">直流用电</label>
     		</div>
-    		
+    		<div class="check-box">
+    			<input type="radio" value="" class="checkbox_poe" id="checkbox_poe" @click.stop="ydradio" name="yd" v-bind:checked = "poeydFlag"/>
+	  			<label class="check-title" for="checkbox_poe">POE用电</label>
+    		</div>
     		<div class="check-box">
     			<input type="checkbox" value="" id="checkbox_yx" name="" />
 	  			<label class="check-title" for="checkbox_yx">遥信</label>
     		</div>
     		
-    		<div class="check-box">
-    			<input type="checkbox" value="" id="checkbox_poe" name="" />
-	  			<label class="check-title" for="checkbox_poe">POE用电</label>
-    		</div>
+    		
     	</div>
     	
     	<div class="device-wrap">
@@ -92,7 +92,7 @@
     						<div class="btn-ground btn-ground-xs">
     							
     							<div class="check-box" v-for = "(item,index) in wkData">
-					    			<input type="radio" :value="index" :id="'wk_check_'+index" name="lan"  v-on:click="lanchange(item.xmbh)"/>
+					    			<input type="radio" :value="index" :id="'wk_check_'+index" name="lan"  v-on:click="lanchange(item.xmbh)" :checked = 'item.xmbh == wkh || item.xmbh == jdwlxh'/>
 						  			<label class="check-title" :for="'wk_check_'+index" >{{ item.xmbh }}</label>
 					    		</div>
 					    		
@@ -110,7 +110,7 @@
     						<div class="btn-ground btn-ground-xs">
     							
     							<div class="check-box" v-for = "(item,index) in wkData">
-					    			<input type="radio" :value="index" :id="'ck_check_'+index" name="ck"  v-on:click="ckchange(item.xmbh)"/>
+					    			<input type="radio" :value="index" :id="'ck_check_'+index" name="ck"  v-on:click="ckchange(item.xmbh)" :checked = 'item.xmbh == wkh || item.xmbh == ckh'/>
 						  			<label class="check-title" :for="'ck_check_'+index" >{{ item.xmbh }}</label>
 					    		</div>
 	    						
@@ -128,7 +128,7 @@
     						<div class="btn-ground btn-ground-xs">
     							
     							<div class="check-box" v-for = "(item,index) in dkData">
-					    			<input type="radio" :value="index" :id="'zl_check_'+index" name="zl"  v-on:click="dkchange(item.xmbh)"/>
+					    			<input type="radio" :value="index" :id="'zl_check_'+index" name="zl"  v-on:click="dkchange(item.xmbh)" :checked = 'item.xmbh == kzhlh'/>
 						  			<label class="check-title" :for="'zl_check_'+index" >{{ item.xmbh }}</label>
 					    		</div>
 	    						
@@ -145,7 +145,7 @@
     						<div class="btn-ground btn-ground-xs">
     							
     							<div class="check-box" v-for = "(item,index) in dkData">
-					    			<input type="radio" :value="index" :id="'jl_check_'+index" name="jl"  v-on:click="dkchange(item.xmbh)"/>
+					    			<input type="radio" :value="index" :id="'jl_check_'+index" name="jl"  v-on:click="dkchange(item.xmbh)" :checked = 'item.xmbh == kzhlh'/>
 						  			<label class="check-title" :for="'jl_check_'+index" >{{ item.xmbh }}</label>
 					    		</div>
 	    						
@@ -164,7 +164,7 @@
     	<div class="btn btn-default cancel" @click="cancelClick" >取消</div>
     	<div class="btn btn-blue" @click="replaceClick" >确定</div>
     </div>
-   	
+	</div>
   </div>
 </template>
 
@@ -182,6 +182,7 @@
 			...mapState({		//取state里面的值
 				zlydFlag : state => state.device_store.zlydFlag,
 				jlydFlag : state => state.device_store.jlydFlag,
+				poeydFlag: state => state.device_store.poeydFlag,
 				lanwkFlag : state => state.device_store.lanwkFlag,
 				ckwkFlag : state => state.device_store.ckwkFlag,
 				sbModel : state => state.device_store.sbModel,	//弹窗标识
@@ -191,7 +192,13 @@
 				dkData : state => state.device_store.dkData,
 				ccbh : state => state.device_store.ccbh,				//出厂编号
 				wlwgNum : state => state.device_store.wlwgNum,				//资产编号
-				txlx : state => state.device_store.txlx
+				txlx : state => state.device_store.txlx,
+				kzhlh : state => state.device_store.kzhlh,
+				jdwlxh : state => state.device_store.jdwlxh,
+				ckh : state => state.device_store.ckh,
+				wkh : state => state.device_store.wkh,
+				ydlx : state => state.device_store.ydlx
+
 			}),
 			ccbh : {	//出厂编号
 		    get() {
@@ -203,12 +210,13 @@
 		  }
 		},
 		mounted(){
-			let zcbh = (this.$store.state.device_store.wlwgNum).split("-")[0];
+			let zcbh = (this.$store.state.device_store.wlwgNum).substring(0,7);
 			let data = {
 	  			zcbh : zcbh,
-	  			type : this.txlx,
+	  			type : this.txlx-1,
 	  		}
 			this.$store.dispatch("getwkData",data);
+			this.$store.dispatch("getydData",data);
 		},
 	  methods:{
 	  	goBack:function(){
@@ -238,7 +246,7 @@
 	  		this.$store.commit('setdk', res);
 	  	},
 	  	wkradio: function(e){	//用网切换
-	  		let zcbh = (this.$store.state.device_store.wlwgNum).split("-")[0];
+	  		let zcbh = (this.$store.state.device_store.wlwgNum).substring(0,7);
 	  		let data = {
 	  			zcbh : zcbh,
 	  			type : "",
@@ -249,7 +257,7 @@
 						ckwkFlag : false	
 	  			}
 	  			this.$store.commit('addsetywState', flag);
-	  			data.type = 2;
+	  			data.type = 1;
 	  			this.$store.commit('settxfs',2);
 	  		}else{	//458网
 	  			let flag = {
@@ -257,13 +265,13 @@
 						ckwkFlag : true	
 	  			}
 	  			this.$store.commit('addsetywState', flag);
-	  			data.type = 3;
+	  			data.type = 2;
 	  			this.$store.commit('settxfs',3);
 	  		}
 	  		this.$store.dispatch("getwkData",data);
 	  	},
 	  	ydradio: function(e){	//用电切换
-	  		let zcbh = (this.$store.state.device_store.wlwgNum).split("-")[0];
+	  		let zcbh = (this.$store.state.device_store.wlwgNum).substring(0,7);
 	  		let data1 = {
 	  			zcbh : zcbh,
 	  			type : 2,
@@ -272,18 +280,29 @@
 	  		if(e.currentTarget.className == "checkbox_jl"){	//交流
 	  			let flag = {
 	  				zlydFlag : false,	
-						jlydFlag : true,	
+					jlydFlag : true,	
+					poeydFlag : false	
 	  			}
 	  			this.$store.commit('addsetydState', flag);
 	  			this.$store.commit("setydlx",3);
-	  		}else{	//直流
+	  		}else if(e.currentTarget.className == "checkbox_zl"){	//直流
 	  			let flag = {
 	  				zlydFlag : true,	
-						jlydFlag : false,	
+					jlydFlag : false,	
+					poeydFlag : false	
 	  			}
 	  			this.$store.commit('addsetydState', flag);
 	  			this.$store.commit("setydlx",4);
-	  		}
+	  		}else{
+				let flag = {
+	  				zlydFlag : false,	
+					jlydFlag : false,	
+					poeydFlag : true	
+	  			}
+	  			this.$store.commit('addsetydState', flag);
+				this.$store.commit("setydlx",2);
+				this.$store.commit('setdk', 0)
+			}
 	  	},
 	  	replaceClick : function(){	//替换
 	  		debugger
@@ -329,13 +348,13 @@
 		height: 100%;
 		width: 100%;
 		background: rgba(0,0,0,0.6);	
-		position: fixed;
+		position: absolute;
 		top: 0;
 		left: 0;
 		z-index: 9999;
 	}
 	.model-box .model-close{
-		font-size: 20px;
+		font-size: 0.9rem;
 		color: #000;
 		position: absolute;
 		top: 3%;
@@ -353,11 +372,11 @@
 	
 	.btn-block{
 		width: 100% !important;
-		background: #217bea;
-		color: #fff;
-		font-size: 16px !important;
-		height: 1.2rem !important;
-		line-height: 1.2rem !important;
+    background: #217bea;
+    color: #fff;
+    font-size: 0.55rem !important;
+    height: 1.4rem !important;
+    line-height: 1.4rem !important;
 	}
 	.sb-box{
 		height: 100%;
@@ -372,29 +391,31 @@
 		flex-direction: column;
 	}
 	.sb-title{
-		height: 0.5rem;
+		height: 0.6rem;
 		text-align: left;;
 		padding-left: 0.33rem;
+		line-height: 0.6rem
 	}
 	.list-box{
 		flex: 1;
 		display: flex;
 		flex-wrap: wrap;
 		align-content: flex-start;
+		margin-top: 0.3rem
 	}
 	
 	.list-box .check-box{
-    width: 1.6rem;
-    height: 1.6rem;
+		width: 2.04rem;
+    height: 2.04rem;
     line-height: 1.6rem;
     text-align: center;
     font-size: 12px;
     color: #217bea;
     position: relative;
-    margin: 0.33rem;
+    margin: 0.13rem;
 	}
 	.list-box .check-box .check-title{
-    position: absolute;
+		position: absolute;
 		top: 0;
 		left: 0;
 		display: block;
@@ -402,13 +423,13 @@
 		height: 100%;
 		line-height: 1.6rem;
 		text-align: center;
-		font-size: 12px;
+		font-size: 0.4rem;
 		border: 1px solid #d1d1d1;
 	}
 	
 	
 	.main-list{
-		height: 1.40rem;
+		height: 1.60rem;
 		border-bottom: 1px solid #f7f7f7;
 		padding: 0 0.50rem;
 		display: flex;
@@ -427,14 +448,14 @@
 	}
 	.list-right .ccbh-ipt{
 		border: 1px solid #d1d1d1;
-		height: .8rem;
-		
+		height: 1rem;
+		color: #217bea;
 	}
 	.main-list .list-left .list-icon{
-		width: 0.80rem;
-		height: 0.80rem;
+		width: 1.2rem;
+    height: 1.2rem;
     margin-left: 0.60rem;
-    opacity:0.4;
+    opacity: 0.6;
 		filter:alpha(opacity=40)
 	}
 	.btn-ground{
@@ -497,8 +518,8 @@
 	}
 	.btn-ground-xs .check-box,
 	.btn-ground-xs .check-box .check-title{
-		width: 1rem;
-    height: 0.8rem;
+		width: 1.2rem;
+    height: 01rem;
     background: white;
 	}
 	
@@ -523,9 +544,10 @@
     	background-size: 100% 100%;
 	}
 	.head .head-title{
-		height: 0.50rem;
+		height: 0.60rem;
 		color: #fff;
-		font-size: 0.50rem;
+		font-size: 0.60rem;
+		line-height: 0.6rem
 	}
 	.head .edit{
 		width: 0.90rem;
@@ -545,10 +567,10 @@
 	}
 	.btn{
 		width: 4.65rem;
-		height: 1.00rem;
-		border: 1px solid #217bea;
-		font-size: 0.36rem;
-		line-height: 1.00rem;
+    height: 1.20rem;
+    border: 1px solid #217bea;
+    font-size: 0.55rem;
+    line-height: 1.20rem;
 		text-align: center;
 	}
 	.btn-default{
@@ -578,6 +600,7 @@
 		margin: 0.12rem;
 		color: #217bea;
 		position: relative;
+		margin-bottom: 0.3rem
 	}
 	.check-box input[type="checkbox"],
 	.check-box input[type="radio"]{
@@ -588,11 +611,11 @@
 		top: 0;
 		left: 0;
 		display: block;
-		width: 2.2rem;
-		height: 0.80rem;
-		line-height: 0.8rem;
+		width: 2.3rem;
+		height: 1rem;
+		line-height: 1rem;
 		text-align: center;
-		font-size: 12px;
+		font-size: 0.5rem;
 		border: 1px solid #d1d1d1;
 		color: #217bea;
 	}
@@ -646,6 +669,7 @@
 	
 	.wgtext{
     line-height: 1.20rem;
+	color: #217bea
 	}
 	
 </style>

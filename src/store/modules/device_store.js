@@ -4,6 +4,7 @@ import Ajax from '../axios/axiosConfig.js'
 const state = {	//定义常量，资源库
 	jlydFlag : '',		//交流用电标识
 	zlydFlag : '',		//直流用电标识
+	poeydFlag: "",		//poe用电
 	sswlwg : '',          //设备绑定的物联网关
 	lanwkFlag : '',		//lan网标识
 	ckwkFlag : '',		//串口标识
@@ -32,8 +33,8 @@ const state = {	//定义常量，资源库
 	jdwlxh : "",				//lan口
 	ckh : "",					//485串口
 	ydlx : "",					//用电类型
-	kzhlh : ""					//电口
-	
+	kzhlh : "",					//	电口
+	wkh : ""
 	
 }
 
@@ -58,6 +59,7 @@ const mutations = {	//改变state里面的数据
 	addsetydState(state,res){		//用电切换
 		state.zlydFlag = res.zlydFlag;
 		state.jlydFlag = res.jlydFlag;
+		state.poeydFlag = res.poeydFlag
 	},
 	addsetywState(state,res){		//用网切换
 		state.lanwkFlag = res.lanwkFlag;
@@ -111,23 +113,25 @@ const mutations = {	//改变state里面的数据
 		state.txfs = res.txfs;
 		state.jdwlxh = res.jdwlxh;
 		state.ckh = res.ckh;
+		state.wkh = res.wkh;
 		state.ydlx = res.ydlx;
 		state.kzhlh = res.kzhlh;
 		state.lanwkFlag = res.txlx==2;		
 		state.ckwkFlag = res.txlx==3;	
 		state.jlydFlag = res.ydlx==3;	
-		state.zlydFlag = res.ydlx==4;		
+		state.zlydFlag = res.ydlx==4;
+		state.poeydFlag = res.ydlx==2;		
 		state.disbh = res.id;
 		state.sswlwg = state.wlwgNum
 		
   		let data = {
-  			zcbh : (state.wlwgNum).split("-")[0],
+  			zcbh : (state.wlwgNum).substring(0,7),
   			type : "1"
   		}
 		this.dispatch("getwkData",data);
 		
   		let data1 = {
-  			zcbh : (state.wlwgNum).split("-")[0],
+  			zcbh : (state.wlwgNum).substring(0,7),
   			type : 3,
   		}
   		this.dispatch("getydData",data1);
